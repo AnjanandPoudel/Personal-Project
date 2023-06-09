@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 
-const { getHotelUsers } = require("../../controllers/inquiry.controller");
+const { getrestaurantUsers } = require("../../controllers/inquiry.controller");
 const { isAdmin } = require("../../middlewares/checkUserType");
 const {
   validate,
@@ -13,7 +13,7 @@ const { validator } = require("../../middlewares/validator");
 const inquiryRouter = require("./inquiry.sec.route");
 
 
-router.get("/", getMethodValidate(), validator, isAdmin(), getHotelUsers);
+router.get("/", getMethodValidate(), validator, isAdmin(), getrestaurantUsers);
 
 
 

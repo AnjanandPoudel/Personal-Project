@@ -7,42 +7,42 @@ const { validator } = require("../../middlewares/validator");
 
 const express = require("express");
 const {
-  getHotelReviews,
+  getrestaurantReviews,
   getReview,
   deleteReview,
   postReviewController,
   patchReviewController,
-  getMyReviewInHotel,
+  getMyReviewInrestaurant,
 } = require("../../controllers/review.controller");
 const {
   checkAuthentication,
 } = require("../../middlewares/checkAuthentication");
 const { isUser } = require("../../middlewares/checkUserType");
 const { checkExistance } = require("../../middlewares/checkExistance");
-const Hotel = require("../../../models/hotel.model");
+const restaurant = require("../../../models/restaurant.model");
 
 const router = express.Router({ mergeParams: true });
 
-router.get("/", getMethodValidate(), validator, getHotelReviews);
+router.get("/", getMethodValidate(), validator, getrestaurantReviews);
 
 router.get(
   "/my-reviews",
   isUser(),
-  validate(["hotelId"]),
+  validate(["restaurantId"]),
   validator,
-  getMyReviewInHotel
+  getMyReviewInrestaurant
 );
 router.get("/:reviewId", validate(["reviewId"]), validator, getReview);
 
 router.post(
   "/",
   isUser(),
-  validate(["review", "rating", "hotelId"]),
+  validate(["review", "rating", "restaurantId"]),
   validator,
-  // checkExistance(Hotel, [
+  // checkExistance(restaurant, [
   //   {
   //     key: "_id",
-  //     value: "params.hotelId",
+  //     value: "params.restaurantId",
   //   },
   // ]),
   postReviewController
@@ -51,7 +51,7 @@ router.post(
 router.patch(
   "/:reviewId",
   isUser(),
-  validate(["reviewId", "hotelId"]),
+  validate(["reviewId", "restaurantId"]),
   validateOpt(["review", "rating"]),
   validator,
   patchReviewController
@@ -60,7 +60,7 @@ router.patch(
 router.delete(
   "/:reviewId",
   isUser(),
-  validate(["reviewId", "hotelId"]),
+  validate(["reviewId", "restaurantId"]),
   validator,
   deleteReview
 );

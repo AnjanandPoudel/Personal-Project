@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 const { PARKING_OPTIONS } = require("../utils/constants");
 const fuzzy = require("../utils/mongoose-fuzzy-search");
 const {
-  RemoveAllPackagesFromHotel,
-} = require("../utils/preMiddlewareFunctions/package");
+  RemoveAlldishpacksFromrestaurant,
+} = require("../utils/preMiddlewareFunctions/dishpack");
 const {
-  RemoveAllRoomsFromHotel,
-} = require("../utils/preMiddlewareFunctions/room");
+  RemoveAlldishsFromrestaurant,
+} = require("../utils/preMiddlewareFunctions/dish");
 const {
-  RemoveAllReviewsFromHotel,
+  RemoveAllReviewsFromrestaurant,
 } = require("../utils/preMiddlewareFunctions/reviews");
 const { deleteFile } = require("../utils/fileHandling");
 const { SetErrorResponse } = require("../utils/responseSetter");
@@ -17,7 +17,7 @@ const Schema = mongoose.Schema;
 
 const metaDataSchema = new Schema({
   _id: false,
-  room: {
+  dish: {
     price: {
       min: {
         type: Number,
@@ -73,7 +73,7 @@ const metaDataSchema = new Schema({
   },
 });
 
-const HotelSchema = new Schema(
+const restaurantSchema = new Schema(
   {
     name: {
       type: String,
@@ -105,7 +105,7 @@ const HotelSchema = new Schema(
       type: String,
       required: false,
     },
-    noOfRooms: {
+    noOfdishs: {
       type: Number,
       required: false,
     },
@@ -155,56 +155,56 @@ const HotelSchema = new Schema(
     },
 
     //just to do the work fast
-    allRoomPrices: {
+    alldishPrices: {
       type: [Number],
     },
-    minRoomPrice: {
+    mindishPrice: {
       type: Number,
     },
-    maxRoomPrice: {
+    maxdishPrice: {
       type: Number,
     },
     //
-    allRoomTypes: {
+    alldishTypes: {
       type: [String],
     },
   },
   { timestamps: true }
 );
 
-HotelSchema.methods = {
-  addAllRoomPrices(price) {
-    this.allRoomPrices.push(price);
-    this.minRoomPrice= Math.min(...this.allRoomPrices)
-    this.maxRoomPrice= Math.max(...this.allRoomPrices)
+restaurantSchema.methods = {
+  addAlldishPrices(price) {
+    this.alldishPrices.push(price);
+    this.mindishPrice= Math.min(...this.alldishPrices)
+    this.maxdishPrice= Math.max(...this.alldishPrices)
   },
-  editAllRoomPrices(price,old) {
+  editAlldishPrices(price,old) {
     if (price) {
-      this.allRoomPrices.splice(this.allRoomPrices.indexOf(old), 1);
-      this.allRoomPrices.push(price);
-      this.minRoomPrice= Math.min(...this.allRoomPrices)
-      this.maxRoomPrice= Math.max(...this.allRoomPrices)
+      this.alldishPrices.splice(this.alldishPrices.indexOf(old), 1);
+      this.alldishPrices.push(price);
+      this.mindishPrice= Math.min(...this.alldishPrices)
+      this.maxdishPrice= Math.max(...this.alldishPrices)
 
     }
   },
-  deleteAllRoomPrices(old) {
-    this.allRoomPrices.splice(this.allRoomPrices.indexOf(old), 1);
-    this.minRoomPrice= Math.min(...this.allRoomPrices)
-    this.maxRoomPrice= Math.max(...this.allRoomPrices)
+  deleteAlldishPrices(old) {
+    this.alldishPrices.splice(this.alldishPrices.indexOf(old), 1);
+    this.mindishPrice= Math.min(...this.alldishPrices)
+    this.maxdishPrice= Math.max(...this.alldishPrices)
 
   },
 
-  addRoomTypes(type) {
-    this.allRoomTypes.push(type);
+  adddishTypes(type) {
+    this.alldishTypes.push(type);
   },
-  editRoomTypes(type,old) {
+  editdishTypes(type,old) {
     if (type) {
-      this.allRoomTypes.splice(this.allRoomTypes.indexOf(old), 1);
-      this.allRoomTypes.push(type);
+      this.alldishTypes.splice(this.alldishTypes.indexOf(old), 1);
+      this.alldishTypes.push(type);
     }
   },
-  deleteRoomTypes(old) {
-    this.allRoomTypes.splice(this.allRoomTypes.indexOf(old), 1);
+  deletedishTypes(old) {
+    this.alldishTypes.splice(this.alldishTypes.indexOf(old), 1);
   },
 
 
@@ -223,24 +223,24 @@ HotelSchema.methods = {
     // }
   },
 
-  increaseRoom(count) {
-    this.noOfRooms += count;
+  increasedish(count) {
+    this.noOfdishs += count;
     // if (!this.meta)
     //   throw new SetErrorResponse("meta not found, Contact us", 500);
-    // if (this.meta) this.meta.room.count += count;
+    // if (this.meta) this.meta.dish.count += count;
   },
 
-  decreaseRoom(count) {
-    this.noOfRooms -= count;
+  decreasedish(count) {
+    this.noOfdishs -= count;
     // if (!this.meta)
     //   throw new SetErrorResponse("meta not found, Contact us", 500);
-    // this.meta.room.count -= count;
+    // this.meta.dish.count -= count;
   },
-  updateRoomCount(count, oldCount) {
-    this.noOfRooms += count - oldCount;
+  updatedishCount(count, oldCount) {
+    this.noOfdishs += count - oldCount;
     // if (!this.meta)
     //   throw new SetErrorResponse("meta not found, Contact us", 500);
-    // this.meta.room.count += count - oldCount;
+    // this.meta.dish.count += count - oldCount;
   },
 
   // makeZero: function () {
@@ -276,16 +276,16 @@ HotelSchema.methods = {
   },
 };
 
-HotelSchema.pre(
+restaurantSchema.pre(
   "deleteOne",
   { document: true, query: false },
   async function (next) {
     try {
       console.log(this);
       await Promise.all([
-        RemoveAllRoomsFromHotel(this?._id),
-        RemoveAllPackagesFromHotel(this?._id),
-        RemoveAllReviewsFromHotel(this?._id),
+        RemoveAlldishsFromrestaurant(this?._id),
+        RemoveAlldishpacksFromrestaurant(this?._id),
+        RemoveAllReviewsFromrestaurant(this?._id),
       ]);
       next();
     } catch (error) {
@@ -294,16 +294,16 @@ HotelSchema.pre(
   }
 );
 
-HotelSchema.plugin(fuzzy, {
+restaurantSchema.plugin(fuzzy, {
   fields: {
     name_tg: "name",
   },
 });
 
-HotelSchema.index({ name_tg: 1 });
+restaurantSchema.index({ name_tg: 1 });
 
-const Hotel = mongoose.model("Hotel", HotelSchema);
-// Hotel.createCollection('hotelInquiryView',{
+const restaurant = mongoose.model("restaurant", restaurantSchema);
+// restaurant.createCollection('restaurantInquiryView',{
 //   // viewOn:'existingCollecti'
 //   pipeline:[
 //     {
@@ -311,7 +311,7 @@ const Hotel = mongoose.model("Hotel", HotelSchema);
 //         _id: "$email",
 //         email:{ $first: "$email" },
 //         name:{ $first: "$name" },
-//         hotelId: { $first: "$hotel" },
+//         restaurantId: { $first: "$restaurant" },
 //         createdAt: {
 //           $push: "$createdAt",
 //         },
@@ -324,7 +324,7 @@ const Hotel = mongoose.model("Hotel", HotelSchema);
 //         localField: "email",
 //         foreignField: "email",
 //         as: "inquiry_doc",
-//         pipeline: [{ $match: {hotel:hotelId} }],
+//         pipeline: [{ $match: {restaurant:restaurantId} }],
 
 //       },
 //     },
@@ -332,4 +332,4 @@ const Hotel = mongoose.model("Hotel", HotelSchema);
 //   ]
 // })
 
-module.exports = Hotel;
+module.exports = restaurant;

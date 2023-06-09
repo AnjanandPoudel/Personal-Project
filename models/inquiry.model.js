@@ -5,10 +5,10 @@ const fuzzy = require("../utils/mongoose-fuzzy-search");
 
 const InquirySchema = new Schema(
     {
-    hotel:{
+    restaurant:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,
-        ref:'Hotel',
+        ref:'restaurant',
         index:true
     },
     // other things are deleted

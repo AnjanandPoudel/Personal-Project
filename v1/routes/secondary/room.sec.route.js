@@ -1,15 +1,15 @@
 const router = require("express").Router({ mergeParams: true });
-const Hotel = require("../../../models/hotel.model");
-const RoomType = require("../../../models/roomType.model");
+const restaurant = require("../../../models/restaurant.model");
+const dishType = require("../../../models/dishType.model");
 const {
-  getHotelRooms,
-  getRoom,
-  RemoveRoomFromHotel,
-  getRoomType,
-  patchHotelRoom,
-  getHotelRoom,
-  postHotelRoom,
-} = require("../../controllers/room.controller");
+  getrestaurantdishs,
+  getdish,
+  RemovedishFromrestaurant,
+  getdishType,
+  patchrestaurantdish,
+  getrestaurantdish,
+  postrestaurantdish,
+} = require("../../controllers/dish.controller");
 const { checkExistance } = require("../../middlewares/checkExistance");
 
 //middlewares
@@ -23,52 +23,52 @@ const {
 const { validator } = require("../../middlewares/validator");
 
 //Routes
-router.get("/", getMethodValidate(), validator, getHotelRooms);
-router.get("/:roomId", validate(["roomId"]), validator, getHotelRoom);
+router.get("/", getMethodValidate(), validator, getrestaurantdishs);
+router.get("/:dishId", validate(["dishId"]), validator, getrestaurantdish);
 
 router.post(
   "/",
-  validate(["roomTypeId", "hotelId", "price", "description", "count"]),
+  validate(["dishTypeId", "restaurantId", "price", "description", "count"]),
   validateArray(["services"]),
-  checkExistance(RoomType, [{
+  checkExistance(dishType, [{
     key:"_id",
-    value:"body.roomTypeId"
-  }],"roomType"),
-  checkExistance(Hotel, [{
+    value:"body.dishTypeId"
+  }],"dishType"),
+  checkExistance(restaurant, [{
     key:"_id",
-    value:"params.hotelId"
-  }],"hotel"),
+    value:"params.restaurantId"
+  }],"restaurant"),
   validator,
-  postHotelRoom
+  postrestaurantdish
 );
 
 router.patch(
-  "/:roomId",
-  validate(["roomId", "roomTypeId", "hotelId"]),
+  "/:dishId",
+  validate(["dishId", "dishTypeId", "restaurantId"]),
   validateOpt(["price", "description", "count"]),
-  checkExistance(RoomType, [{
+  checkExistance(dishType, [{
     key:"_id",
-    value:"body.roomTypeId"
+    value:"body.dishTypeId"
   }]),
-  checkExistance(Hotel, [{
+  checkExistance(restaurant, [{
     key:"_id",
-    value:"params.hotelId"
+    value:"params.restaurantId"
   }]),
   
   validator,
-  patchHotelRoom
+  patchrestaurantdish
 );
 
 router.delete(
-  "/:roomId",
-  validate(["roomId"]),
+  "/:dishId",
+  validate(["dishId"]),
   validator,
-  checkExistance(Hotel, [{
+  checkExistance(restaurant, [{
     key:"_id",
-    value:"params.hotelId"
+    value:"params.restaurantId"
   }]),
   isAdmin(),
-  RemoveRoomFromHotel
+  RemovedishFromrestaurant
 );
 
 module.exports = router;

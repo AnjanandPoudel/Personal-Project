@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
-const { PARKING_OPTIONS, ROOMTYPE } = require("../utils/constants");
+const { PARKING_OPTIONS, dishTYPE } = require("../utils/constants");
 const Schema = mongoose.Schema;
 const fuzzy = require("../utils/mongoose-fuzzy-search");
 
 
-const RoomTypeSchema = new Schema(
+const dishTypeSchema = new Schema(
     {
         type:{
             type:String,
-            enum:Object.values(ROOMTYPE),
+            enum:Object.values(dishTYPE),
             trim:true,
             index:true
            },
@@ -27,14 +27,14 @@ const RoomTypeSchema = new Schema(
 
 
 
-RoomTypeSchema.plugin(fuzzy,{
+dishTypeSchema.plugin(fuzzy,{
     fields:{
       title_tg:"type"
     }
   }
   )
   
-  RoomTypeSchema.index({title_tg:1})
+  dishTypeSchema.index({title_tg:1})
 
-const RoomType = mongoose.model("RoomType", RoomTypeSchema);
-module.exports = RoomType;
+const dishType = mongoose.model("dishType", dishTypeSchema);
+module.exports = dishType;

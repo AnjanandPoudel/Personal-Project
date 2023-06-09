@@ -1,5 +1,5 @@
 const express = require("express");
-const { patchInquiryByAdmin, getHotelUserInquiries } = require("../../controllers/inquiry.controller");
+const { patchInquiryByAdmin, getrestaurantUserInquiries } = require("../../controllers/inquiry.controller");
 const router = express.Router({ mergeParams: true });
 
 //controllers
@@ -22,7 +22,7 @@ const { validator } = require("../../middlewares/validator");
 //   validate([""]),
 //   validator,
 //   isAdmin(),
-//   getHotelUserInquiries
+//   getrestaurantUserInquiries
 // );
 router.get(
   "/",
@@ -30,13 +30,13 @@ router.get(
   validate([""]),
   validator,
   // isAdmin(),
-  getHotelUserInquiries
+  getrestaurantUserInquiries
 );
 
 router.patch(
   "/:mark-as-read",
   isAdmin(),
-  validate(["markAsRead","hotelId"]),
+  validate(["markAsRead","restaurantId"]),
   validator,
   patchInquiryByAdmin
 );

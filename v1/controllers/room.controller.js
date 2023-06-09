@@ -1,14 +1,14 @@
-const RoomType = require("../../models/roomType.model");
-const Room = require("../../models/room.model");
+const dishType = require("../../models/dishType.model");
+const dish = require("../../models/dish.model");
 const { SetErrorResponse } = require("../../utils/responseSetter");
 const { getFuzzySearchPaginatedData } = require("../utils/pagination");
 
-//? may not need this cause it is already present in hotel controller
-exports.getRoomTypes = async (req, res) => {
+//? may not need this cause it is already present in restaurant controller
+exports.getdishTypes = async (req, res) => {
   try {
     const { page, limit, search, sort } = req.query;
-    const rooms = await getFuzzySearchPaginatedData(
-      RoomType,
+    const dishs = await getFuzzySearchPaginatedData(
+      dishType,
       {
         query: {},
         sort,
@@ -21,18 +21,18 @@ exports.getRoomTypes = async (req, res) => {
       },
       search
     );
-    if (rooms?.length < 1) throw new SetErrorResponse();
+    if (dishs?.length < 1) throw new SetErrorResponse();
 
-    return res.success(rooms);
+    return res.success(dishs);
   } catch (error) {
     res.fail(error);
   }
 };
 
-exports.getRoomType = async (req, res) => {
+exports.getdishType = async (req, res) => {
   try {
-    const { roomTypeId } = req.params;
-    const data = await RoomType.findOne({ _id: roomTypeId });
+    const { dishTypeId } = req.params;
+    const data = await dishType.findOne({ _id: dishTypeId });
     if (!data) throw new SetErrorResponse();
     return res.success({ data });
   } catch (error) {
@@ -40,56 +40,56 @@ exports.getRoomType = async (req, res) => {
   }
 };
 
-exports.postRoomType = async (req, res) => {
+exports.postdishType = async (req, res) => {
   try {
     const { type, description, name } = req.body;
-    const room = await new RoomType({
+    const dish = await new dishType({
       name,
       type,
       description,
     }).save();
 
-    if (!room) throw new SetErrorResponse("Error Creating", 403);
-    return res.success({}, "Room Created ");
+    if (!dish) throw new SetErrorResponse("Error Creating", 403);
+    return res.success({}, "dish Created ");
   } catch (error) {
     res.fail(error);
   }
 };
 
-exports.patchRoomType = async (req, res) => {
+exports.patchdishType = async (req, res) => {
   try {
-    const roomTypeId = req.params.roomTypeId;
+    const dishTypeId = req.params.dishTypeId;
     const { type, description, name } = req.body;
 
-    const room = await RoomType.findByIdAndUpdate(
-      { _id: roomTypeId },
+    const dish = await dishType.findByIdAndUpdate(
+      { _id: dishTypeId },
       { name, type, description }
     );
-    if (!room) throw new SetErrorResponse("Room Not Found");
-    return res.success({}, "Room Updated ");
+    if (!dish) throw new SetErrorResponse("dish Not Found");
+    return res.success({}, "dish Updated ");
   } catch (error) {
     req.file(error);
   }
 };
 
-exports.deleteRoomType = async (req, res) => {
+exports.deletedishType = async (req, res) => {
   try {
-    const { roomTypeId } = req.params;
-    const room = await RoomType.findByIdAndDelete(roomTypeId).lean();
-    if (!room) throw new SetErrorResponse();
+    const { dishTypeId } = req.params;
+    const dish = await dishType.findByIdAndDelete(dishTypeId).lean();
+    if (!dish) throw new SetErrorResponse();
 
-    return res.success({}, "Package Deleted ! ");
+    return res.success({}, "dishpack Deleted ! ");
   } catch (error) {
     res.fail(error);
   }
 };
 
-//* Following code is for Hotel + Rooms
+//* Following code is for restaurant + dishs
 
-exports.getHotelRoom = async (req, res) => {
+exports.getrestaurantdish = async (req, res) => {
   try {
-    const { hotelId, roomId } = req.params;
-    const data = await Room.find({ hotel: hotelId, roomId }).lean();
+    const { restaurantId, dishId } = req.params;
+    const data = await dish.find({ restaurant: restaurantId, dishId }).lean();
 
     if (!data) throw new SetErrorResponse();
     return res.success(data);
@@ -97,51 +97,51 @@ exports.getHotelRoom = async (req, res) => {
     res.fail(error);
   }
 };
-exports.getHotelRooms = async (req, res) => {
+exports.getrestaurantdishs = async (req, res) => {
   try {
-    const hotelId = req.params.hotelId;
-    const rooms = await Room.find({ hotel: hotelId }).lean();
+    const restaurantId = req.params.restaurantId;
+    const dishs = await dish.find({ restaurant: restaurantId }).lean();
 
-    if (rooms?.length < 1) throw new SetErrorResponse("Rooms Not Found");
-    return res.success(rooms);
+    if (dishs?.length < 1) throw new SetErrorResponse("dishs Not Found");
+    return res.success(dishs);
   } catch (error) {
     res.fail(error);
   }
 };
 
-exports.postHotelRoom = async (req, res) => {
+exports.postrestaurantdish = async (req, res) => {
   try {
-    const { hotelId } = req.params;
-    const { roomTypeId, price, description, count, services } = req.body;
+    const { restaurantId } = req.params;
+    const { dishTypeId, price, description, count, services } = req.body;
     
-    const room = await new Room({
-      hotel: hotelId,
-      roomType: roomTypeId,
+    const dish = await new dish({
+      restaurant: restaurantId,
+      dishType: dishTypeId,
       price,
       description,
       count,
       services,
     })
     
-    room.save()
-    if (!room) throw new SetErrorResponse("Error Creating Room",500);
+    dish.save()
+    if (!dish) throw new SetErrorResponse("Error Creating dish",500);
 
-    const hotel=req?.existedDoc
-    if(!hotel) throw new SetErrorResponse("If you see this please contact us!",500)
+    const restaurant=req?.existedDoc
+    if(!restaurant) throw new SetErrorResponse("If you see this please contact us!",500)
 
-    const roomType= req?.roomType
-    if(!roomType) throw new SetErrorResponse("If you see this please contact us!",500)
+    const dishType= req?.dishType
+    if(!dishType) throw new SetErrorResponse("If you see this please contact us!",500)
 
-    // hotel.increaseRoom(count)
-    // hotel.pushRoomPrice(price)
-    // hotel.pushRoomType(roomTypeId)
-    hotel.addAllRoomPrices(price)
-    hotel.addRoomTypes(roomType.type)
-    hotel.save()
+    // restaurant.increasedish(count)
+    // restaurant.pushdishPrice(price)
+    // restaurant.pushdishType(dishTypeId)
+    restaurant.addAlldishPrices(price)
+    restaurant.adddishTypes(dishType.type)
+    restaurant.save()
 
 
 
-    return res.success({room}, "Room Created !!");
+    return res.success({dish}, "dish Created !!");
   } catch (error) {
     res.fail(error);
   }
@@ -149,17 +149,17 @@ exports.postHotelRoom = async (req, res) => {
 
 
 
-exports.patchHotelRoom = async (req, res) => {
+exports.patchrestaurantdish = async (req, res) => {
   try {
-    const { hotelId, roomId } = req.params;
-    const { roomTypeId, price, description, count, services } = req.body;
-    const room = await Room.findOneAndUpdate(
+    const { restaurantId, dishId } = req.params;
+    const { dishTypeId, price, description, count, services } = req.body;
+    const dish = await dish.findOneAndUpdate(
       {
-        room: roomId,
-        hotel: hotelId,
+        dish: dishId,
+        restaurant: restaurantId,
       },
       {
-        roomType: roomTypeId,
+        dishType: dishTypeId,
         price,
         description,
         count,
@@ -167,49 +167,49 @@ exports.patchHotelRoom = async (req, res) => {
       }
     ).lean();
 
-    if (!room) throw new SetErrorResponse("Room Not Found");
-    const hotel=req?.existedDoc
-    if(!hotel) throw new SetErrorResponse("If you see this please contact us!",500)
-    const roomType= req?.roomType
-    if(!roomType  ) throw new SetErrorResponse("If you see this please contact us!",500)
+    if (!dish) throw new SetErrorResponse("dish Not Found");
+    const restaurant=req?.existedDoc
+    if(!restaurant) throw new SetErrorResponse("If you see this please contact us!",500)
+    const dishType= req?.dishType
+    if(!dishType  ) throw new SetErrorResponse("If you see this please contact us!",500)
     
-    const oldRoomType=RoomType.findById(room?.roomType,"type").lean()
+    const olddishType=dishType.findById(dish?.dishType,"type").lean()
     
-    hotel.updateRoomCount(count,room.count)
-    // hotel.updateRoomPrice(price,room.price)
-    // hotel.updateRoomType(roomTypeId,room.roomTypeId)
-    hotel.editAllRoomPrices(price,room.price)
-    hotel.editRoomTypes(roomType.type,oldRoomType.type)
-    hotel.save()
+    restaurant.updatedishCount(count,dish.count)
+    // restaurant.updatedishPrice(price,dish.price)
+    // restaurant.updatedishType(dishTypeId,dish.dishTypeId)
+    restaurant.editAlldishPrices(price,dish.price)
+    restaurant.editdishTypes(dishType.type,olddishType.type)
+    restaurant.save()
 
-    return res.success({}, "Room Updated !!");
+    return res.success({}, "dish Updated !!");
   } catch (error) {
     res.fail(error);
   }
 };
 
 
-exports.RemoveRoomFromHotel = async (req, res) => {
+exports.RemovedishFromrestaurant = async (req, res) => {
   try {
-    const { hotelId, roomId } = req.params;
-    const room = await Room.findOneAndDelete({
-      hotel: hotelId,
-      room: roomId,
+    const { restaurantId, dishId } = req.params;
+    const dish = await dish.findOneAndDelete({
+      restaurant: restaurantId,
+      dish: dishId,
     }).lean();
 
-    if (!room) throw new SetErrorResponse();
-    const hotel=req?.existedDoc
-    if(!hotel) throw new SetErrorResponse("If you see this please contact us!",500)
-    const roomType= req?.roomType
-    if(!roomType  ) throw new SetErrorResponse("If you see this please contact us!",500)
+    if (!dish) throw new SetErrorResponse();
+    const restaurant=req?.existedDoc
+    if(!restaurant) throw new SetErrorResponse("If you see this please contact us!",500)
+    const dishType= req?.dishType
+    if(!dishType  ) throw new SetErrorResponse("If you see this please contact us!",500)
 
 
-    hotel.increaseRoom(room.count)
-    // hotel.popRoomPrice(room.price)
-    // hotel.popRoomType(room.roomTypeId)
-    hotel.deleteAllRoomPrices(room.price)
-    hotel.deleteRoomTypes(roomType.type)
-    hotel.save()
+    restaurant.increasedish(dish.count)
+    // restaurant.popdishPrice(dish.price)
+    // restaurant.popdishType(dish.dishTypeId)
+    restaurant.deleteAlldishPrices(dish.price)
+    restaurant.deletedishTypes(dishType.type)
+    restaurant.save()
 
     return res.success({}, "Deleted");
   } catch (error) {

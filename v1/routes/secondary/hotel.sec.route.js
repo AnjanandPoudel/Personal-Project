@@ -4,7 +4,7 @@ const router =  express.Router({mergeParams:true})
 
 
 //controllers
-const { getHotelsInLocation } = require("../../controllers/hotel.controller");
+const { getrestaurantsInLocation } = require("../../controllers/restaurant.controller");
 
 
 //middlewares
@@ -14,6 +14,6 @@ const { validator } = require("../../middlewares/validator");
 
 
 //API
-router.get("/", getMethodValidate(), validator, getHotelsInLocation);
+router.get("/", getMethodValidate(), validator, getrestaurantsInLocation);
 
 module.exports=router

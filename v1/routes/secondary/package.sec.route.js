@@ -7,25 +7,25 @@ const { validator } = require("../../middlewares/validator");
 
 const express = require("express");
 const {
-  getPackage,
-  getHotelPackages,
-  RemovePackageFromHotel,
-} = require("../../controllers/package.controller");
+  getdishpack,
+  getrestaurantdishpacks,
+  RemovedishpackFromrestaurant,
+} = require("../../controllers/dishpack.controller");
 const {  isAdmin } = require("../../middlewares/checkUserType");
 
 const router = express.Router({ mergeParams: true });
 
-router.get("/", getMethodValidate(), validator, getHotelPackages);
-router.get("/:packageId", validate(["packageId"]), validator, getPackage);
+router.get("/", getMethodValidate(), validator, getrestaurantdishpacks);
+router.get("/:dishpackId", validate(["dishpackId"]), validator, getdishpack);
 
-// router.post('/',validate(["name","description","price"]) , validator , getHotelPackages)
+// router.post('/',validate(["name","description","price"]) , validator , getrestaurantdishpacks)
 
 router.delete(
-  "/:packageId",
-  validate(["packageId"]),
+  "/:dishpackId",
+  validate(["dishpackId"]),
   validator,
   isAdmin(),
-  RemovePackageFromHotel
+  RemovedishpackFromrestaurant
 );
 
 module.exports = router;

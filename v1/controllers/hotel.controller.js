@@ -1,19 +1,19 @@
 const e = require("express");
-const Hotel = require("../../models/hotel.model");
+const restaurant = require("../../models/restaurant.model");
 const Inquiry = require("../../models/inquiry.model");
 const Location = require("../../models/location.model");
-const Package = require("../../models/package");
-const PackageHotelRel = require("../../models/packageHotelRel");
+const dishpack = require("../../models/dishpack");
+const dishpackrestaurantRel = require("../../models/dishpackrestaurantRel");
 const Review = require("../../models/review.model");
-const Room = require("../../models/room.model");
-const RoomType = require("../../models/roomType.model");
+const dish = require("../../models/dish.model");
+const dishType = require("../../models/dishType.model");
 const { deleteFile } = require("../../utils/fileHandling");
 const { SetErrorResponse } = require("../../utils/responseSetter");
 const { getFuzzySearchPaginatedData } = require("../utils/pagination");
 
 
 
-exports.getHotels = async (req, res, next) => {
+exports.getrestaurants = async (req, res, next) => {
   try {
     const {
       page,
@@ -25,11 +25,11 @@ exports.getHotels = async (req, res, next) => {
       querySelect,
       locationId,
       rating,
-      roomType,
+      dishType,
     } = req.query;
     let inquirySelect = null;
     let query = {};
-    let roomTypeArr;
+    let dishTypeArr;
 
     if (locationId) {
       query.location = locationId;
@@ -37,17 +37,17 @@ exports.getHotels = async (req, res, next) => {
     if (rating) {
       query.averageRating = { $gte: rating };
     }
-    if (roomType) {
-      roomTypeArr=roomType.split('-')
-      query.allRoomTypes={$in:roomTypeArr}
+    if (dishType) {
+      dishTypeArr=dishType.split('-')
+      query.alldishTypes={$in:dishTypeArr}
     }
     if (inquiry || inquiryBool ) {
       inquirySelect = "name email createdAt phoneNumber ";
     }
 
 
-    let hotels = await getFuzzySearchPaginatedData(
-      Hotel,
+    let restaurants = await getFuzzySearchPaginatedData(
+      restaurant,
       {
         query: query,
         sort,
@@ -57,16 +57,16 @@ exports.getHotels = async (req, res, next) => {
         lean: true,
         pagination: true,
         modFunction: async (document) => {
-          const room = await Room.find({ hotel: document?._id }).select(
+          const dish = await dish.find({ restaurant: document?._id }).select(
             "count price"
           );
           let count = 0;
           let prices = [];
-          room.forEach((item) => {
+          dish.forEach((item) => {
             count = parseInt(item.count) + count;
             prices.push(item?.price);
           });
-          document.totalRoom = count;
+          document.totaldish = count;
           document.startingPrice = Math.min(...prices);
 
 
@@ -75,14 +75,14 @@ exports.getHotels = async (req, res, next) => {
           ).lean()
           document.location=location
 
-          if(roomType){
+          if(dishType){
             let notSending=true
-            let roomTypeArr=[]
-            roomTypeArr=roomType.split('_')
-            console.log(typeof roomTypeArr)
+            let dishTypeArr=[]
+            dishTypeArr=dishType.split('_')
+            console.log(typeof dishTypeArr)
 
-            roomTypeArr?.forEach(item=>{
-              document?.allRoomTypes?.forEach(element=>{
+            dishTypeArr?.forEach(item=>{
+              document?.alldishTypes?.forEach(element=>{
                 console.log(document)
                 if(item==element){
                   notSending=false
@@ -107,19 +107,19 @@ exports.getHotels = async (req, res, next) => {
       (select =
         querySelect ||
         inquirySelect ||
-        "-noOfRooms "
+        "-noOfdishs "
         )
     );
 
     if (inquiry) {
-      hotels = await Hotel.aggregate([
+      restaurants = await restaurant.aggregate([
         { $sort: { createdAt: -1 } },
 
         {
           $lookup: {
             from: "inquiries",
             localField: "_id",
-            foreignField: "hotel",
+            foreignField: "restaurant",
             as: "inquiry_doc",
             pipeline: [],
           },
@@ -155,29 +155,29 @@ exports.getHotels = async (req, res, next) => {
         },
         { $sort: { createdAt: -1 } },
       ]);
-      hotels.forEach((hotel) => {
-        hotel.markAsRead = hotel?.markAsRead?.every((data) => data);
+      restaurants.forEach((restaurant) => {
+        restaurant.markAsRead = restaurant?.markAsRead?.every((data) => data);
       });
       
     }
 
     if (false) {
-      hotels = await Inquiry.aggregate([
+      restaurants = await Inquiry.aggregate([
         
         {
           $lookup: {
-            from: "hotels",
-            localField: "hotel",
+            from: "restaurants",
+            localField: "restaurant",
             foreignField: "_id",
-            as: "hotel",
+            as: "restaurant",
           },
         },
-        { $unwind: "$hotel" },
+        { $unwind: "$restaurant" },
         // { $sort: { "inquiry_doc.createdAt": -1 } },
         
         {
           $group: {
-            _id: "$hotel._id",
+            _id: "$restaurant._id",
             email: { $first: "$email" },
             name: { $first: "$name" },
             createdAt: { $max: "$createdAt" },
@@ -193,10 +193,10 @@ exports.getHotels = async (req, res, next) => {
     }
 
     if(inquiry){
-      res.success({results:hotels});
+      res.success({results:restaurants});
     }
     else{
-      res.success(hotels);
+      res.success(restaurants);
 
     }
     
@@ -207,13 +207,13 @@ exports.getHotels = async (req, res, next) => {
 
 
 
-exports.postHotelController = async (req, res, next) => {
+exports.postrestaurantController = async (req, res, next) => {
   try {
     const {
       name,
       breakfast,
       parking,
-      noOfRooms,
+      noOfdishs,
       checkInTime,
       locationId,
       latitude,
@@ -222,8 +222,8 @@ exports.postHotelController = async (req, res, next) => {
       email,
       phoneNumber,
       secondaryPhoneNumber,
-      rooms,
-      packages,
+      dishs,
+      dishpacks,
       description,
     } = req.body;
 
@@ -238,11 +238,11 @@ exports.postHotelController = async (req, res, next) => {
     ).lean();
     if (!isLocation) throw new SetErrorResponse("Location Not Found", 400);
 
-    const hotel = new Hotel({
+    const restaurant = new restaurant({
       name,
       breakfast,
       parking,
-      noOfRooms,
+      noOfdishs,
       location: locationId,
       coordinates: coordinatesJson,
       checkInTime,
@@ -258,35 +258,35 @@ exports.postHotelController = async (req, res, next) => {
     // Images
     // CANT DISPLAY
 
-    //Room
-    await Promise.all([hotel.save(), package, room].flat(2));
+    //dish
+    await Promise.all([restaurant.save(), dishpack, dish].flat(2));
 
-    hotel.save()    
+    restaurant.save()    
 
-    if (!hotel) throw new SetErrorResponse("Hotel not Created", 400);
-    return res.success(hotel, "Hotel Created ");
+    if (!restaurant) throw new SetErrorResponse("restaurant not Created", 400);
+    return res.success(restaurant, "restaurant Created ");
   } catch (error) {
     res.fail(error);
   }
 };
 
-exports.deleteHotel = async (req, res, next) => {
+exports.deleterestaurant = async (req, res, next) => {
   try {
-    const hotelId = req.params.hotelId;
-    const hotel = await Hotel.findOne({ _id: hotelId });
+    const restaurantId = req.params.restaurantId;
+    const restaurant = await restaurant.findOne({ _id: restaurantId });
 
-    if (!hotel) throw new SetErrorResponse();
-    await hotel.deleteOne();
-    if (hotel?.relatedImages) {
-      for (let i = 0; i < hotel?.relatedImages?.length; i++) {
-        deleteFile(hotel?.relatedImages[i]);
+    if (!restaurant) throw new SetErrorResponse();
+    await restaurant.deleteOne();
+    if (restaurant?.relatedImages) {
+      for (let i = 0; i < restaurant?.relatedImages?.length; i++) {
+        deleteFile(restaurant?.relatedImages[i]);
       }
     }
-    if (hotel?.coverImage) {
-      deleteFile(hotel?.coverImage);
+    if (restaurant?.coverImage) {
+      deleteFile(restaurant?.coverImage);
     }
 
-    return res.success({}, "Hotel Deleted ");
+    return res.success({}, "restaurant Deleted ");
   } catch (error) {
     res.fail(error);
   }

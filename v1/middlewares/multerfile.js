@@ -1,10 +1,10 @@
-const { getS3 } = require("../../config/digitalOceanSpace");
+const { getS3 } = require("../../config/aws");
 const multer = require("multer");
 const {  spaceReducer } = require("../../utils/slugify.utls");
 
 exports.uploadImages = ({
-  secondaryPath = "homestay/hotel",
-  path = "hotelpath",
+  secondaryPath = "homestay/restaurant",
+  path = "restaurantpath",
   singleName = "",
   multi = false,
   fileSize = 122880,

@@ -2,8 +2,8 @@ const { check, query, validationResult } = require("express-validator");
 const { isJsonParsable, isFloatParseble } = require("../../utils/isParsable");
 const {
   PARKING_OPTIONS,
-  ROOMTYPE,
-  ROOM_SERVICES,
+  dishTYPE,
+  dish_SERVICES,
 } = require("../../utils/constants");
 
 exports.validateArray = (params) => {
@@ -18,7 +18,7 @@ exports.validateArray = (params) => {
               .custom((data) => {
                 let bool = true;
                 data.forEach((item) => {
-                  if (!Object.values(ROOM_SERVICES).includes(item)) {
+                  if (!Object.values(dish_SERVICES).includes(item)) {
                     bool = false;
                   }
                 });
@@ -43,9 +43,9 @@ exports.validateArray = (params) => {
               .isArray()
           );
           break;
-        case "rooms":
+        case "dishs":
           result.push(
-            check("rooms", "rooms must be array")
+            check("dishs", "dishs must be array")
               .custom((data) => isJsonParsable(data))
               .withMessage("Not Json parsable")
               .customSanitizer((data) => {
@@ -57,11 +57,11 @@ exports.validateArray = (params) => {
               })
               .isArray(),
 
-            check("rooms.*.roomTypeId", "roomTypeId should be mongoId")
+            check("dishs.*.dishTypeId", "dishTypeId should be mongoId")
               .notEmpty()
               .isMongoId(),
 
-            check("rooms.*.price", "price should be ")
+            check("dishs.*.price", "price should be ")
               .isNumeric()
               .isFloat({ min: 0 })
               .toFloat()
@@ -69,22 +69,22 @@ exports.validateArray = (params) => {
                 data = data.toFixed(5);
                 return data;
               }),
-            check("rooms.*.description", "description not Valid")
+            check("dishs.*.description", "description not Valid")
               .optional()
               .isLength({ min: 3, max: 500 })
               .isString(),
 
-            check("rooms.*.count", "count not Valid")
+            check("dishs.*.count", "count not Valid")
               .optional()
               .toInt()
               .isInt(),
 
-            check("rooms.*.services", "services not Valid")
+            check("dishs.*.services", "services not Valid")
               .isArray()
               .custom((data) => {
                 let bool = true;
                 data.forEach((item) => {
-                  if (!Object.values(ROOM_SERVICES).includes(item)) {
+                  if (!Object.values(dish_SERVICES).includes(item)) {
                     bool = false;
                   }
                 });
@@ -158,7 +158,7 @@ exports.getMethodValidate = () => {
               .optional()
               .isLength({ min: 3, max: 20 })
               .isString()
-              .custom((data) => Object.values(ROOMTYPE).includes(data))
+              .custom((data) => Object.values(dishTYPE).includes(data))
           );
           break;
 
@@ -281,7 +281,7 @@ exports.validateOpt = (params) => {
               .optional()
               .isLength({ min: 3, max: 20 })
               .isString()
-              .custom((data) => Object.values(ROOMTYPE).includes(data))
+              .custom((data) => Object.values(dishTYPE).includes(data))
           );
           break;
 
@@ -465,9 +465,9 @@ exports.validateOpt = (params) => {
           );
           break;
 
-          case "roomTypeId":
+          case "dishTypeId":
           result.push(
-            check("roomTypeId", "roomTypeId should be MongoId")
+            check("dishTypeId", "dishTypeId should be MongoId")
               .optional()
               .isMongoId()
           );
@@ -665,7 +665,7 @@ exports.validate = (params) => {
               .notEmpty()
               .isLength({ min: 3, max: 20 })
               .isString()
-              .custom((data) => Object.values(ROOMTYPE).includes(data))
+              .custom((data) => Object.values(dishTYPE).includes(data))
           );
           break;
 
@@ -786,26 +786,26 @@ exports.validate = (params) => {
           );
           break;
 
-        case "hotelId":
+        case "restaurantId":
           result.push(
-            check("hotelId", "hotelId should be a mongoId and not Empty")
+            check("restaurantId", "restaurantId should be a mongoId and not Empty")
               .notEmpty()
               .isLength({ min: 5, max: 50 })
               .isMongoId()
           );
           break;
 
-        case "roomId":
+        case "dishId":
           result.push(
-            check("roomId", "roomId should be MongoId")
+            check("dishId", "dishId should be MongoId")
               .notEmpty()
               .isMongoId()
           );
           break;
 
-        case "roomTypeId":
+        case "dishTypeId":
           result.push(
-            check("roomTypeId", "roomTypeId should be MongoId")
+            check("dishTypeId", "dishTypeId should be MongoId")
               .notEmpty()
               .isMongoId()
           );
@@ -822,9 +822,9 @@ exports.validate = (params) => {
           );
           break;
 
-        case "noOfRooms":
+        case "noOfdishs":
           result.push(
-            check("noOfRooms", "noOfRooms is not Valid")
+            check("noOfdishs", "noOfdishs is not Valid")
               .optional()
               .toInt()
               .isInt({ gt: 0, lt: 500 })

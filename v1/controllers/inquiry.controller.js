@@ -21,7 +21,7 @@
       //     from: "inquiries",
       //     let: {
       //       firstUser: "_id",
-      //       secondUser: "hotel",
+      //       secondUser: "restaurant",
       //     },
       //     pipeline: [
       //       {
@@ -32,7 +32,7 @@
       //                 $eq: ["$_id", "$$firstUser"],
       //               },
       //               {
-      //                 $eq: ["$hotelId", "$$secondUser"],
+      //                 $eq: ["$restaurantId", "$$secondUser"],
       //               },
       //             ],
       //           },

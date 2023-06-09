@@ -30,9 +30,9 @@ const ReviewSchema = new Schema(
         index:true
 
     },
-    hotel:{
+    restaurant:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Hotel",
+        ref:"restaurant",
         index:true
 
     },

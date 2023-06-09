@@ -1,11 +1,11 @@
 /* const {
-  getHotels,
-  postHotelController,
-  getHotel,
-  deleteHotel,
-  patchHotelController,
+  getrestaurants,
+  postrestaurantController,
+  getrestaurant,
+  deleterestaurant,
+  patchrestaurantController,
   
-} = require("../../controllers/hotel.controller");
+} = require("../../controllers/restaurant.controller");
 
 
 
@@ -13,8 +13,8 @@ const { uploadImages } = require("../../middlewares/multerfile");
 const { validate, validateOpt, getMethodValidate, validateArray } = require("../../middlewares/validate");
 const { validator } = require("../../middlewares/validator");
 
-const packageRouter = require("../secondary/package.sec.route");
-const roomRouter = require("../secondary/room.sec.route");
+const dishpackRouter = require("../secondary/dishpack.sec.route");
+const dishRouter = require("../secondary/dish.sec.route");
 const reviewRouter = require("../secondary/review.sec.route");
 const inquiryRouter = require("../secondary/inquiry.sec.route");
 const userRouter = require("../secondary/user.sec.route");
@@ -23,21 +23,21 @@ const { checkUserType, isAdmin } = require("../../middlewares/checkUserType");
 
 const router = require("express")();
 
-router.get("/", getMethodValidate(), validator, isAdmin,getHotels);
-router.get("/:hotelId", validate(["hotelId"]), validator, getHotel);
+router.get("/", getMethodValidate(), validator, isAdmin,getrestaurants);
+router.get("/:restaurantId", validate(["restaurantId"]), validator, getrestaurant);
 
 
 
 router.post(
   "/",
   uploadImages({
-    secondaryPath:"/homestay/hotel",
+    secondaryPath:"/homestay/restaurant",
     singleName:'coverImage'
   }),
   validate([
     "name",
     "parking",
-    "noOfRooms",
+    "noOfdishs",
     "locationId",
     "checkInTime",
     "checkOutTime",
@@ -46,20 +46,20 @@ router.post(
     "secondaryPhoneNumber",
     "coordinates"
   ]),
-  validateArray(["rooms","packages"]),
+  validateArray(["dishs","dishpacks"]),
   validator,
   checkAuthentication(),
   checkUserType,
   isAdmin,
-  postHotelController
+  postrestaurantController
 );
 
 router.patch(
-  "/:hotelId",
+  "/:restaurantId",
   validateOpt([
   "name",
   "parking",
-  "noOfRooms",
+  "noOfdishs",
   "locationId",
   "checkInTime",
   "checkOutTime",
@@ -68,18 +68,18 @@ router.patch(
   "secondaryPhoneNumber"
 ]),
   validate([
-    "hotelId",
+    "restaurantId",
   ]),
   validator,
-  patchHotelController
+  patchrestaurantController
 );
 
-router.delete("/:hotelId", validate(["hotelId"]), validator, deleteHotel);
+router.delete("/:restaurantId", validate(["restaurantId"]), validator, deleterestaurant);
 
-router.use("/:hotelId/package", validate(["hotelId"]), packageRouter);
-router.use("/:hotelId/room", validate(["hotelId"]), roomRouter);
-router.use("/:hotelId/review", validate(["hotelId"]), reviewRouter);
-router.use("/:hotelId/user", validate(["hotelId"]), userRouter);
+router.use("/:restaurantId/dishpack", validate(["restaurantId"]), dishpackRouter);
+router.use("/:restaurantId/dish", validate(["restaurantId"]), dishRouter);
+router.use("/:restaurantId/review", validate(["restaurantId"]), reviewRouter);
+router.use("/:restaurantId/user", validate(["restaurantId"]), userRouter);
 
 module.exports = router;
  */

@@ -2,7 +2,7 @@ const router = require("express").Router({ mergeParams: true });
 const { check } = require("express-validator");
 
 //routers
-const hotelRouter= require('./secondary/hotel.sec.route')
+const restaurantRouter= require('./secondary/restaurant.sec.route')
 
 //controllers
 const {
@@ -40,7 +40,7 @@ router.post(
   "/",
   isAdmin(),
   uploadImages({
-    secondaryPath:"/homestay/hotel",
+    secondaryPath:"/homestay/restaurant",
     singleName:"coverImage"
   }),
   validType("type"),
@@ -53,7 +53,7 @@ router.patch(
   "/:locationId",
   isAdmin(),
   uploadImages({
-    secondaryPath:"/homestay/hotel",
+    secondaryPath:"/homestay/restaurant",
     singleName:"coverImage"
   }),
   validType("type"),
@@ -73,6 +73,6 @@ router.delete(
 
 //!use
 
-router.use('/:locationId/hotel',hotelRouter)
+router.use('/:locationId/restaurant',restaurantRouter)
 
 module.exports = router;

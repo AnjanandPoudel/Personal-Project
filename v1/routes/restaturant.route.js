@@ -1,14 +1,14 @@
 const {
-  getHotels,
-  postHotelController,
-  getHotel,
-  deleteHotel,
-  patchHotelController,
-  patchHotelCoverImageController,
-  patchHotelRelatedImagesController,
-  putAllHotel,
-  getHotelName,
-} = require("../controllers/hotel.controller");
+  getrestaurants,
+  postrestaurantController,
+  getrestaurant,
+  deleterestaurant,
+  patchrestaurantController,
+  patchrestaurantCoverImageController,
+  patchrestaurantRelatedImagesController,
+  putAllrestaurant,
+  getrestaurantName,
+} = require("../controllers/restaurant.controller");
 
 const { uploadImages } = require("../middlewares/multerfile");
 const {
@@ -19,38 +19,38 @@ const {
 } = require("../middlewares/validate");
 const { validator } = require("../middlewares/validator");
 
-const packageRouter = require("./secondary/package.sec.route");
-const roomRouter = require("./secondary/room.sec.route");
+const dishpackRouter = require("./secondary/dishpack.sec.route");
+const dishRouter = require("./secondary/dish.sec.route");
 const reviewRouter = require("./secondary/review.sec.route");
 const userRouter = require("./_user/user.sec.route");
 const adminRouter = require("./admin/admin.sec.route");
 const {  isAdmin } = require("../middlewares/checkUserType");
 const { checkExistance } = require("../middlewares/checkExistance");
-const RoomType = require("../../models/roomType.model");
+const dishType = require("../../models/dishType.model");
 
 const router = require("express")();
 
 router.get(
   "/",
   getMethodValidate(),
-  validateOpt(["locationId","rating","roomTypeId"]),
+  validateOpt(["locationId","rating","dishTypeId"]),
   validator,
-  getHotels
+  getrestaurants
 );
-router.get("/:hotelId", validate(["hotelId"]), validator, getHotel);
-// router.get("/:hotelId/hotel-name", validate(["hotelId"]), validator, getHotelName);
+router.get("/:restaurantId", validate(["restaurantId"]), validator, getrestaurant);
+// router.get("/:restaurantId/restaurant-name", validate(["restaurantId"]), validator, getrestaurantName);
 
 router.post(
   "/",
   isAdmin(),
   uploadImages({
-    secondaryPath: "/homestay/hotel",
+    secondaryPath: "/homestay/restaurant",
     singleName: "coverImage",
   }),
   validate([
     "name",
     "parking",
-    "noOfRooms",
+    "noOfdishs",
     "locationId",
     "checkInTime",
     "checkOutTime",
@@ -61,9 +61,9 @@ router.post(
     "description"
   ]),
   validateOpt(["email",]),
-  validateArray(["rooms", "packages"]),
+  validateArray(["dishs", "dishpacks"]),
   validator,
-  postHotelController
+  postrestaurantController
 );
 
 

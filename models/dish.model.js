@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
-const { ROOM_SERVICES } = require("../utils/constants");
+const { dish_SERVICES } = require("../utils/constants");
 const Schema = mongoose.Schema;
 
-const RoomSchema = new Schema(
+const dishSchema = new Schema(
     {
-        roomType:{
+        dishType:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:'RoomType',
+            ref:'dishType',
             index:true
 
         },
-        hotel:{
+        restaurant:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:'Hotel',
+            ref:'restaurant',
             index:true
 
         },
@@ -32,7 +32,7 @@ const RoomSchema = new Schema(
         },
         services:{
             type:[String],
-            enum:Object.values(ROOM_SERVICES),
+            enum:Object.values(dish_SERVICES),
             required:false
         }
        
@@ -40,5 +40,5 @@ const RoomSchema = new Schema(
     { timestamps: true }
 );
 
-const Room = mongoose.model("Room", RoomSchema);
-module.exports = Room;
+const dish = mongoose.model("dish", dishSchema);
+module.exports = dish;
