@@ -1,0 +1,36 @@
+{
+  "name": "Hotel management system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js",
+    "swagger": "node helpers/swagger/swagger.js",
+    "readJson": "node helpers/swagger/addResponse.js"
+  },
+  "author": "Anjan",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1256.0",
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-jwt": "^7.7.5",
+    "express-validator": "^6.14.2",
+    "http": "^0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.7.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cache": "^5.1.2",
+    "nodemon": "^2.0.20",
+    "pm2": "^5.2.2",
+    "redis": "^4.4.0",
+    "sib-api-v3-sdk": "^8.4.2",
+    "swagger-autogen": "^2.22.0",
+    "swagger-ui-express": "^4.5.0"
+  }
+}
